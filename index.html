@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Snaplate – AI Food Scanner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --green: #3ecf6e;
+      --dark-green: #27a855;
+      --bg: #0f1512;
+      --card: #161e1a;
+      --card2: #1c2821;
+      --text: #e8f0eb;
+      --muted: #7a9485;
+      --accent: #f5c842;
+      --border: #1e2e26;
+      --red: #ff6b6b;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #2a3d33; border-radius: 3px; }
+
+    /* NAV */
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 48px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0;
+      background: rgba(15,21,18,0.96);
+      backdrop-filter: blur(10px);
+      z-index: 200;
+    }
+    .logo { font-size: 1.45rem; font-weight: 900; color: var(--green); letter-spacing: -0.5px; text-decoration: none; }
+    .logo em { color: var(--accent); font-style: normal; }
+    nav ul { list-style: none; display: flex; gap: 26px; }
+    nav ul a { color: var(--muted); text-decoration: none; font-weight: 700; font-size: 0.9rem; transition: color 0.2s; }
+    nav ul a:hover { color: var(--green); }
+    .nav-cta {
+      background: var(--green); color: #0a0f0c;
+      padding: 9px 22px; border-radius: 50px;
+      font-weight: 800; font-size: 0.88rem;
+      border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      font-family: 'Nunito', sans-serif;
+    }
+    .nav-cta:hover { background: var(--dark-green); transform: scale(1.04); }
+
+    /* HERO */
+    #home {
+      position: relative; text-align: center;
+      padding: 100px 20px 80px; overflow: hidden;
+    }
+    .hero-glow {
+      position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(62,207,110,0.10) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(62,207,110,0.10); border: 1px solid rgba(62,207,110,0.28);
+      color: var(--green); font-size: 0.75rem; font-weight: 800;
+      padding: 5px 14px; border-radius: 50px; margin-bottom: 24px;
+      letter-spacing: 0.6px; text-transform: uppercase;
+      animation: fadeDown 0.6s ease both;
+    }
+    .hero-h1 {
+      font-size: clamp(2.5rem, 6.5vw, 4.5rem); font-weight: 900;
+      line-height: 1.08; margin-bottom: 22px; letter-spacing: -1.5px;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+    .hero-h1 span { color: var(--green); }
+    .hero-sub {
+      font-size: 1.1rem; color: var(--muted);
+      max-width: 540px; margin: 0 auto 38px; line-height: 1.75;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+    .hero-btns {
+      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+    .btn-primary {
+      background: var(--green); color: #0a0f0c;
+      padding: 13px 30px; border-radius: 50px;
+      font-weight: 800; font-size: 0.98rem;
+      border: none; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: all 0.22s; text-decoration: none;
+      font-family: 'Nunito', sans-serif;
+    }
+    .btn-primary:hover { background: var(--dark-green); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(62,207,110,0.28); }
+    .btn-outline {
+      background: transparent; border: 1.5px solid var(--border);
+      color: var(--text); padding: 13px 28px; border-radius: 50px;
+      font-weight: 700; font-size: 0.98rem; cursor: pointer;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--green); color: var(--green); }
+
+    /* PHONE */
+    .phone-wrap { margin: 70px auto 0; display: flex; justify-content: center; animation: fadeUp 0.8s 0.4s ease both; }
+    .phone {
+      width: 236px; background: #111a15;
+      border-radius: 38px; border: 2px solid #243328;
+      padding: 14px 12px 18px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.55), 0 0 60px rgba(62,207,110,0.06);
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+    .phone-notch { width:65px; height:9px; background:#0a0f0c; border-radius:8px; margin:0 auto 12px; }
+    .phone-screen { background:#0a0f0c; border-radius:22px; padding:14px; display:flex; flex-direction:column; gap:9px; }
+    .phone-header { font-size:0.68rem; font-weight:900; color:var(--green); text-transform:uppercase; letter-spacing:0.5px; }
+    .scan-box {
+      background:rgba(62,207,110,0.05); border:1.5px dashed rgba(62,207,110,0.3);
+      border-radius:14px; height:130px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+      position:relative; overflow:hidden;
+    }
+    .scan-line {
+      position:absolute; width:82%; height:1.5px;
+      background:linear-gradient(90deg,transparent,var(--green),transparent);
+      animation:scanMove 1.8s linear infinite; border-radius:2px;
+    }
+    @keyframes scanMove { 0%{top:18%} 100%{top:82%} }
+    .scan-emoji { font-size:1.8rem; }
+    .scan-hint { font-size:0.6rem; color:var(--muted); font-weight:700; }
+    .res-card { background:var(--card); border-radius:11px; padding:9px 11px; border:1px solid var(--border); }
+    .res-food { font-size:0.8rem; font-weight:800; margin-bottom:5px; }
+    .pills { display:flex; gap:5px; flex-wrap:wrap; }
+    .pill { font-size:0.58rem; font-weight:700; padding:2px 7px; border-radius:50px; }
+    .pill.g { background:rgba(62,207,110,0.12); color:var(--green); }
+    .pill.r { background:rgba(255,107,107,0.12); color:var(--red); }
+    .pill.y { background:rgba(245,200,66,0.12); color:var(--accent); }
+    .ai-badge { font-size:0.56rem; font-weight:700; padding:2px 6px; border-radius:50px; background:rgba(245,200,66,0.12); color:var(--accent); display:inline-block; margin-top:4px; }
+
+    /* SHARED */
+    section { padding: 88px 20px; }
+    .container { max-width: 1080px; margin: 0 auto; }
+    .sec-label { font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--green); margin-bottom:10px; display:block; }
+    .sec-title { font-size:clamp(1.7rem, 3.5vw, 2.4rem); font-weight:900; letter-spacing:-0.8px; line-height:1.15; margin-bottom:14px; }
+    .sec-desc { color:var(--muted); font-size:1rem; line-height:1.75; max-width:580px; }
+    .divider { border:none; border-top:1px solid var(--border); margin:0; }
+
+    /* ABOUT */
+    .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
+    .mission-card {
+      background:var(--card2); border:1px solid var(--border); border-left:3px solid var(--green);
+      border-radius:14px; padding:20px 22px; margin-top:18px;
+    }
+    .mission-card h4 { font-size:0.78rem; font-weight:800; color:var(--green); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:7px; }
+    .mission-card p { font-size:0.9rem; color:var(--muted); line-height:1.7; }
+    .about-stats { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .stat-box {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:16px; padding:24px 20px; text-align:center;
+      transition:border-color 0.2s, transform 0.2s;
+    }
+    .stat-box:hover { border-color:rgba(62,207,110,0.3); transform:translateY(-3px); }
+    .stat-box .num { font-size:2rem; font-weight:900; color:var(--green); font-family:'Space Mono',monospace; }
+    .stat-box .lbl { font-size:0.8rem; color:var(--muted); font-weight:700; margin-top:4px; }
+
+    /* PROBLEM */
+    #problem { background:var(--card); }
+    .prob-grid { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start; }
+    .prob-cards { display:flex; flex-direction:column; gap:14px; }
+    .prob-card {
+      background:var(--bg); border:1px solid var(--border); border-radius:14px;
+      padding:18px 20px; display:flex; gap:14px; align-items:flex-start;
+      transition:border-color 0.2s;
+    }
+    .prob-card:hover { border-color:rgba(255,107,107,0.3); }
+    .prob-icon { font-size:1.5rem; min-width:34px; }
+    .prob-card h4 { font-size:0.92rem; font-weight:800; margin-bottom:5px; }
+    .prob-card p { font-size:0.85rem; color:var(--muted); line-height:1.6; }
+    .prob-who { background:var(--bg); border:1px solid var(--border); border-radius:18px; padding:28px 24px; }
+    .prob-who h3 { font-size:1rem; font-weight:800; margin-bottom:16px; }
+    .who-item { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--border); font-size:0.9rem; color:var(--muted); }
+    .who-item:last-child { border-bottom:none; }
+    .who-icon { font-size:1.2rem; min-width:28px; text-align:center; }
+
+    /* SOLUTION */
+    .solution-top { display:grid; grid-template-columns:1.1fr 1fr; gap:52px; align-items:start; margin-bottom:56px; }
+    .how-steps { display:flex; flex-direction:column; gap:0; }
+    .how-step { display:flex; gap:18px; align-items:flex-start; padding-bottom:28px; position:relative; }
+    .how-step:last-child { padding-bottom:0; }
+    .how-step:not(:last-child)::after {
+      content:''; position:absolute; left:17px; top:38px;
+      width:2px; height:calc(100% - 38px);
+      background:linear-gradient(to bottom, rgba(62,207,110,0.3), transparent);
+    }
+    .step-num {
+      width:36px; height:36px; min-width:36px; border-radius:50%;
+      background:rgba(62,207,110,0.1); border:1.5px solid rgba(62,207,110,0.35);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Space Mono',monospace; font-size:0.72rem; font-weight:700;
+      color:var(--green); position:relative; z-index:1;
+    }
+    .how-step h4 { font-size:0.95rem; font-weight:800; margin-bottom:4px; }
+    .how-step p { font-size:0.86rem; color:var(--muted); line-height:1.6; }
+    .benefit-box { background:var(--card2); border:1px solid var(--border); border-radius:12px; padding:14px 16px; font-size:0.88rem; color:var(--muted); line-height:1.65; margin-bottom:10px; }
+    .features-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(248px, 1fr)); gap:18px; }
+    .feat-card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:26px 22px; transition:border-color 0.2s, transform 0.2s; }
+    .feat-card:hover { border-color:rgba(62,207,110,0.3); transform:translateY(-4px); }
+    .feat-emoji { font-size:1.9rem; margin-bottom:12px; display:block; }
+    .feat-card h3 { font-size:0.98rem; font-weight:800; margin-bottom:7px; }
+    .feat-card p { font-size:0.86rem; color:var(--muted); line-height:1.65; }
+
+    /* CONTACT */
+    .contact-wrap { display:grid; grid-template-columns:1fr 1fr; gap:52px; align-items:start; }
+    .contact-form { display:flex; flex-direction:column; gap:14px; }
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-group label { font-size:0.82rem; font-weight:700; color:var(--muted); }
+    .form-group input, .form-group textarea {
+      background:var(--card); border:1px solid var(--border); border-radius:10px;
+      padding:12px 16px; color:var(--text); font-family:'Nunito',sans-serif;
+      font-size:0.92rem; transition:border-color 0.2s; outline:none;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color:var(--green); }
+    .form-group textarea { resize:vertical; min-height:110px; }
+    .form-submit {
+      background:var(--green); color:#0a0f0c; border:none; border-radius:50px;
+      padding:13px 30px; font-weight:800; font-size:0.96rem; cursor:pointer;
+      transition:all 0.2s; align-self:flex-start; font-family:'Nunito',sans-serif;
+    }
+    .form-submit:hover { background:var(--dark-green); transform:translateY(-2px); }
+    .contact-info { display:flex; flex-direction:column; gap:14px; margin-top:4px; }
+    .contact-item { display:flex; gap:14px; align-items:flex-start; padding:18px 20px; background:var(--card); border:1px solid var(--border); border-radius:14px; transition:border-color 0.2s; }
+    .contact-item:hover { border-color:rgba(62,207,110,0.3); }
+    .ci-icon { font-size:1.4rem; }
+    .ci-label { font-size:0.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px; }
+    .ci-val { font-size:0.9rem; font-weight:700; }
+    .ci-val a { color:var(--text); text-decoration:none; }
+    .ci-val a:hover { color:var(--green); }
+    .socials { display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; }
+    .soc-btn {
+      background:var(--card2); border:1px solid var(--border); color:var(--muted);
+      text-decoration:none; font-size:0.8rem; font-weight:700;
+      padding:6px 13px; border-radius:50px; transition:all 0.2s;
+    }
+    .soc-btn:hover { border-color:var(--green); color:var(--green); }
+
+    /* FOOTER */
+    footer {
+      border-top:1px solid var(--border); padding:28px 48px;
+      display:flex; justify-content:space-between; align-items:center;
+      flex-wrap:wrap; gap:12px;
+    }
+    footer p { color:var(--muted); font-size:0.82rem; }
+    .footer-made { font-family:'Space Mono',monospace; font-size:0.75rem; color:var(--muted); }
+    .footer-made span { color:var(--green); }
+
+    /* MODAL */
+    .modal-overlay {
+      position:fixed; inset:0;
+      background:rgba(8,14,10,0.88);
+      backdrop-filter:blur(8px);
+      z-index:500; display:flex; align-items:center; justify-content:center;
+      opacity:0; pointer-events:none; transition:opacity 0.25s;
+    }
+    .modal-overlay.open { opacity:1; pointer-events:all; }
+    .modal {
+      background:var(--card); border:1px solid #253628; border-radius:24px;
+      width:100%; max-width:420px; padding:36px 32px; position:relative;
+      transform:translateY(20px) scale(0.97); transition:transform 0.25s;
+      box-shadow:0 40px 100px rgba(0,0,0,0.6); margin:0 16px;
+    }
+    .modal-overlay.open .modal { transform:translateY(0) scale(1); }
+    .modal-close { position:absolute; top:16px; right:18px; background:none; border:none; cursor:pointer; color:var(--muted); font-size:1.3rem; line-height:1; transition:color 0.2s; }
+    .modal-close:hover { color:var(--text); }
+    .modal-logo { font-size:1.2rem; font-weight:900; color:var(--green); margin-bottom:4px; }
+    .modal-logo em { color:var(--accent); font-style:normal; }
+    .modal-tabs { display:flex; background:var(--bg); border-radius:10px; padding:4px; margin:20px 0 24px; gap:4px; }
+    .tab-btn {
+      flex:1; background:none; border:none; color:var(--muted);
+      font-family:'Nunito',sans-serif; font-size:0.88rem; font-weight:700;
+      padding:9px; border-radius:7px; cursor:pointer; transition:all 0.2s;
+    }
+    .tab-btn.active { background:var(--green); color:#0a0f0c; }
+    .modal-form { display:flex; flex-direction:column; gap:13px; }
+    .modal-form .form-group label { font-size:0.78rem; }
+    .modal-form .form-group input { background:var(--bg); padding:11px 14px; font-size:0.9rem; }
+    .modal-submit {
+      background:var(--green); color:#0a0f0c; border:none; border-radius:50px;
+      padding:12px; font-family:'Nunito',sans-serif; font-weight:800; font-size:0.95rem;
+      cursor:pointer; margin-top:4px; transition:all 0.2s;
+    }
+    .modal-submit:hover { background:var(--dark-green); }
+    .modal-divider { text-align:center; color:var(--muted); font-size:0.78rem; font-weight:700; margin:2px 0; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+
+    /* TOAST */
+    .toast {
+      position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px);
+      background:var(--dark-green); color:#fff;
+      padding:10px 24px; border-radius:50px; font-size:0.88rem; font-weight:700;
+      opacity:0; pointer-events:none; transition:all 0.3s; z-index:600;
+    }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+
+    /* RESPONSIVE */
+    @media(max-width:860px) {
+      nav { padding:14px 20px; }
+      nav ul { display:none; }
+      .about-grid, .prob-grid, .solution-top, .contact-wrap { grid-template-columns:1fr; gap:28px; }
+      footer { flex-direction:column; text-align:center; padding:24px 20px; }
+      section { padding:64px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#home" class="logo">Snap<em>late</em> 🍽️</a>
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#solution">Solution</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="nav-cta" onclick="openModal()">Sign In / Sign Up</button>
+</nav>
+
+<!-- HOME -->
+<section id="home">
+  <div class="hero-glow"></div>
+  <div class="badge"> Introducing </div>
+  <h1 class="hero-h1">Snap your food.<br/><span>Know what you eat.</span></h1>
+  <p class="hero-sub">Snaplate uses AI to instantly identify any food from your camera — giving you calories, macros, and health insights in seconds.</p>
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="openModal()">🚀 Get Started Free</button>
+    <a href="#solution" class="btn-outline">See how it works →</a>
+  </div>
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="phone-header">🍽️ Snaplate</div>
+        <div class="scan-box">
+          <div class="scan-line"></div>
+          <div class="scan-emoji">📷</div>
+          <div class="scan-hint">Point camera at food</div>
+        </div>
+        <div class="res-card">
+          <div class="res-food">🍕 Margherita Pizza</div>
+          <div class="pills">
+            <span class="pill g">285 kcal</span>
+            <span class="pill g">Carbs 36g</span>
+            <span class="pill r">Fat 10g</span>
+            <span class="pill y">Protein 11g</span>
+          </div>
+          <span class="ai-badge">⚡ AI</span>
+        </div>
+        <div class="res-card">
+          <div style="font-size:0.66rem;color:var(--muted);">📊 Today — 1240 / 2000 kcal</div>
+          <div style="background:#111a15;border-radius:4px;height:5px;margin-top:6px;">
+            <div style="background:var(--green);width:62%;height:100%;border-radius:4px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ABOUT US -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div>
+        <span class="sec-label">About Us</span>
+        <h2 class="sec-title">We're making healthy eating actually easy.</h2>
+        <p class="sec-desc">Snaplate is an Android app built by a first-year CS student at SOIT RGPV, Bhopal. The idea was simple — counting calories shouldn't require a nutrition degree or manual data entry. So we built an AI that does it for you, instantly.</p>
+        <div class="mission-card">
+          <h4>🎯 Our Mission</h4>
+          <p>To make food awareness accessible to everyone — students, busy professionals, fitness beginners — by removing all friction from calorie tracking.</p>
+        </div>
+        <div class="mission-card" style="border-left-color:var(--accent);margin-top:12px;">
+          <h4 style="color:var(--accent);">👁️ Our Vision</h4>
+          <p>A world where understanding what you eat takes a single snap — no labels, no barcodes, no effort.</p>
+        </div>
+      </div>
+      <div class="about-stats">
+        <div class="stat-box"><div class="num">3s</div><div class="lbl">Avg. scan time</div></div>
+        <div class="stat-box"><div class="num">500+</div><div class="lbl">Food items recognised</div></div>
+        <div class="stat-box"><div class="num">AI</div><div class="lbl">Gemini powered</div></div>
+        <div class="stat-box"><div class="num">0₹</div><div class="lbl">Free to use</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- PROBLEM STATEMENT -->
+<section id="problem">
+  <div class="container">
+    <span class="sec-label">The Problem</span>
+    <h2 class="sec-title">Eating healthy is hard when you don't know what's on your plate.</h2>
+    <p class="sec-desc" style="margin-bottom:44px;">People want to eat better — but existing tools make it tedious, frustrating, and easy to quit.</p>
+    <div class="prob-grid">
+      <div class="prob-cards">
+        <div class="prob-card">
+          <div class="prob-icon">😩</div>
+          <div>
+            <h4>Manual logging is a nightmare</h4>
+            <p>Apps like MyFitnessPal require searching hundreds of entries, estimating portions, and repeating this for every meal — every single day.</p>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-icon">🏷️</div>
+          <div>
+            <h4>No label? No data.</h4>
+            <p>Homemade food, restaurant meals, and street food have no barcode. Most apps give up — leaving people completely guessing.</p>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-icon">📉</div>
+          <div>
+            <h4>People give up quickly</h4>
+            <p>80% of people who start calorie tracking quit within two weeks — because it's just too tedious to maintain.</p>
+          </div>
+        </div>
+      </div>
+      <div class="prob-who">
+        <h3>🧑‍🤝‍🧑 Who faces this problem?</h3>
+        <div class="who-item"><span class="who-icon">🧑‍🎓</span> College students eating hostel / canteen food</div>
+        <div class="who-item"><span class="who-icon">💼</span> Working professionals with no time to track</div>
+        <div class="who-item"><span class="who-icon">🏋️</span> Fitness beginners starting their health journey</div>
+        <div class="who-item"><span class="who-icon">👨‍👩‍👧</span> Parents managing family nutrition</div>
+        <div class="who-item"><span class="who-icon">🩺</span> People managing diet-related health conditions</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- SOLUTION -->
+<section id="solution">
+  <div class="container">
+    <span class="sec-label">Our Solution</span>
+    <h2 class="sec-title">Point. Snap. Know.</h2>
+    <p class="sec-desc" style="margin-bottom:52px;">Snaplate replaces every tedious step with a single camera tap. No searching, no typing, no guessing.</p>
+
+    <div class="solution-top">
+      <div>
+        <p style="font-size:0.78rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:22px;">How it works</p>
+        <div class="how-steps">
+          <div class="how-step">
+            <div class="step-num">01</div>
+            <div>
+              <h4>Open and point your camera</h4>
+              <p>Launch Snaplate and aim at any food — a plate, a snack, a bowl. No special setup needed.</p>
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="step-num">02</div>
+            <div>
+              <h4>Gemini AI identifies it instantly</h4>
+              <p>Google's Gemini Vision model analyses the image, recognises the food, and retrieves accurate nutritional data.</p>
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="step-num">03</div>
+            <div>
+              <h4>See your full nutrition breakdown</h4>
+              <p>Calories, protein, carbs, fat — displayed clearly and automatically logged to your daily tracker.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:0.78rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:18px;">How it helps you</p>
+        <div class="benefit-box">✅ <strong style="color:var(--text);">No manual data entry</strong> — snap and it's logged automatically.</div>
+        <div class="benefit-box">✅ <strong style="color:var(--text);">Works on any food</strong> — home-cooked, restaurant, or street food.</div>
+        <div class="benefit-box">✅ <strong style="color:var(--text);">Daily calorie tracker</strong> — know where you stand every day.</div>
+        <div class="benefit-box">✅ <strong style="color:var(--text);">Fast and private</strong> — results in 3 seconds, no account needed to start.</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.78rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:20px;">Key Features</p>
+    <div class="features-grid">
+      <div class="feat-card"><span class="feat-emoji">🤖</span><h3>AI Food Recognition</h3><p>Gemini Vision identifies food from photos — no barcodes or labels needed.</p></div>
+      <div class="feat-card"><span class="feat-emoji">🥗</span><h3>Full Nutrition Data</h3><p>Calories, macros, vitamins, and a health score for every meal you scan.</p></div>
+      <div class="feat-card"><span class="feat-emoji">📊</span><h3>Daily Calorie Tracker</h3><p>A clean dashboard showing your daily intake vs goal, updated automatically.</p></div>
+      <div class="feat-card"><span class="feat-emoji">📱</span><h3>Native Android App</h3><p>Built natively for Android — fast, smooth, no web wrappers or lag.</p></div>
+      <div class="feat-card"><span class="feat-emoji">🔒</span><h3>Private by Default</h3><p>No account required to start. Your data stays on your device.</p></div>
+      <div class="feat-card"><span class="feat-emoji">⚡</span><h3>Results in 3 Seconds</h3><p>Snap and see your nutrition breakdown instantly. Built for busy people.</p></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <span class="sec-label">Contact</span>
+    <h2 class="sec-title">Get in touch</h2>
+    <p class="sec-desc" style="margin-bottom:44px;">Have feedback, questions, or just want to say hi? We'd love to hear from you.</p>
+    <div class="contact-wrap">
+      <form class="contact-form" onsubmit="handleContact(event)">
+        <div class="form-group">
+          <label>Your Name</label>
+          <input type="text" name="name" placeholder="Your full name" required/>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" name="email" placeholder="you@example.com" required/>
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea nmae="message" placeholder="Tell us what you think about Snaplate..." required></textarea>
+        </div>
+        <button type="submit" class="form-submit">Send Message 📨</button>
+      </form>
+      <div class="contact-info">
+        <div class="contact-item">
+          <span class="ci-icon">📧</span>
+          <div>
+            <div class="ci-label">Email</div>
+            <div class="ci-val"><a href="mailto:hidhruvbaghel@gmail.com">hello@snaplate.app</a></div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <span class="ci-icon">📍</span>
+          <div>
+            <div class="ci-label">Location</div>
+            <div class="ci-val">Bhopal, Madhya Pradesh, India</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <span class="ci-icon">🔗</span>
+          <div>
+            <div class="ci-label">Social Links</div>
+            <div class="socials">
+              <a href="https://github.com/ru-dhruv" target="_blank" class="soc-btn">GitHub</a>
+              <a href="https://linkedin.com/in/dhruv-singh-b80068344" target="_blank" class="soc-btn">LinkedIn</a>
+              <a href="#" class="soc-btn">Twitter</a>
+            </div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <span class="ci-icon">💬</span>
+          <div>
+            <div class="ci-label">Response Time</div>
+            <div class="ci-val" style="color:var(--muted);font-size:0.88rem;font-weight:600;">Usually within 24 hours</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#home" class="logo">Snap<em>late</em> 🍽️</a>
+  <p>© 2025 Snaplate. All rights reserved.</p>
+  <div class="footer-made">Made with <span>♥</span> by Dhruv Singh</div>
+</footer>
+
+<!-- SIGN IN / SIGN UP MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modalBox">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-logo">Snap<em>late</em> 🍽️</div>
+    <p style="font-size:0.82rem;color:var(--muted);margin-top:2px;">Your AI-powered food companion</p>
+    <div class="modal-tabs">
+      <button class="tab-btn active" id="tabSignin" onclick="switchTab('signin')">Sign In</button>
+      <button class="tab-btn" id="tabSignup" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+
+    <!-- SIGN IN PANEL -->
+    <div class="tab-panel active" id="signinPanel">
+      <div class="modal-form">
+        <div class="form-group"><label>Email Address</label><input type="email" placeholder="you@example.com"/></div>
+        <div class="form-group"><label>Password</label><input type="password" placeholder="••••••••"/></div>
+        <button class="modal-submit" onclick="handleAuth('signin')">Sign In →</button>
+        <div class="modal-divider">— or —</div>
+        <button class="modal-submit" style="background:var(--card2);color:var(--text);border:1px solid var(--border);" onclick="handleAuth('google')">🌐 Continue with Google</button>
+        <p style="font-size:0.78rem;color:var(--muted);text-align:center;margin-top:2px;">Don't have an account? <a href="#" style="color:var(--green);font-weight:700;" onclick="switchTab('signup');return false;">Sign Up</a></p>
+      </div>
+    </div>
+
+    <!-- SIGN UP PANEL -->
+    <div class="tab-panel" id="signupPanel">
+      <div class="modal-form">
+        <div class="form-group"><label>Full Name</label><input type="text" placeholder="Your full name"/></div>
+        <div class="form-group"><label>Email Address</label><input type="email" placeholder="you@example.com"/></div>
+        <div class="form-group"><label>Password</label><input type="password" placeholder="Create a strong password"/></div>
+        <button class="modal-submit" onclick="handleAuth('signup')">Create Account →</button>
+        <div class="modal-divider">— or —</div>
+        <button class="modal-submit" style="background:var(--card2);color:var(--text);border:1px solid var(--border);" onclick="handleAuth('google')">🌐 Continue with Google</button>
+        <p style="font-size:0.78rem;color:var(--muted);text-align:center;margin-top:2px;">Already have an account? <a href="#" style="color:var(--green);font-weight:700;" onclick="switchTab('signin');return false;">Sign In</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function openModal() {
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+  function switchTab(tab) {
+    document.getElementById('signinPanel').classList.toggle('active', tab === 'signin');
+    document.getElementById('signupPanel').classList.toggle('active', tab === 'signup');
+    document.getElementById('tabSignin').classList.toggle('active', tab === 'signin');
+    document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
+  }
+  function handleAuth(type) {
+    const msgs = {
+      signin: '✅ Signed in successfully!',
+      signup: '🎉 Account created! Welcome to Snaplate.',
+      google: '🌐 Google auth coming soon!'
+    };
+    showToast(msgs[type]);
+    if (type !== 'google') setTimeout(closeModal, 400);
+}
+  function handleContact(e) {
+  e.preventDefault();
+  fetch('https://formspree.io/f/xwvrjdgv', {
+    method: 'POST',
+    body: new FormData(e.target),
+    headers: { 'Accept': 'application/json' }
+  }).then(res => {
+    if (res.ok) {
+      showToast("✅ Message sent! We'll reply within 24 hours.");
+      e.target.reset();
+    } else {
+      showToast("❌ Something went wrong. Try again.");
+    }
+  });
+}
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
