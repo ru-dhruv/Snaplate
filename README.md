@@ -73,7 +73,7 @@ fetch('https://formspree.io/f/YOUR_FORM_ID', { ... })
 
 ---
 
-## 🔮 Future Features(coming soon)
+## 🔮 Future Features (coming soon)
 
 Here's what's coming next to Snaplate:
 
